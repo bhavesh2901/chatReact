@@ -53,6 +53,8 @@ body::after
 {
     display: flex;
     align-items: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 .mobile
 {

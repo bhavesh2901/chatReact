@@ -1,13 +1,44 @@
 import React, { useState } from 'react';
 import './ChatApp.css'; 
 import Header from '../Header/Header';
+import { UserProvider ,useUser } from '../../UserContext';
+
 
 const ChatApp = () => {
     const [showBox, setShowBox] = useState(false);
-
+    const { user } = useUser();
     const handleChatListClick = () => {
       setShowBox(true);
     };
+    let fullname = '';
+    let name = '';
+    let UserID = '';
+    let email = '';
+    let userPhone = '';
+    let userPhoto = '';
+    let school = '';
+    let collage = '';
+    let City = '';
+    let maritalstatus = '';
+    let bippic = '';
+    let joining = '';
+    let gender = '';
+ 
+    if (user) {
+        fullname =   user['user_profile']
+        name =    user['name']
+        UserID =   user['id']
+        email =   user['email']
+        userPhone =   user['mobail']
+        userPhoto =   user['pro_pic']
+        school =    user['bio_pic']
+        collage =   user['collage']
+        City =   user['city']
+        maritalstatus =   user['marital_status']
+        bippic =    user['bio_pic']
+        joining =   user['createat']
+        gender =   user['gender']
+    }
   
     const handleChatIconClick = () => {
       setShowBox(false);
