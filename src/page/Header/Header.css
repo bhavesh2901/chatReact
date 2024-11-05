@@ -1,0 +1,12 @@
+.hide
+{
+  display: none !important;
+  visibility: hidden;
+  transition: opacity 0.1s ease, visibility 0.s ease;
+}
+.show
+{
+    display: block !important;
+    visibility: visible;
+    transition: opacity 0.1s ease, visibility 0.1s ease;
+}

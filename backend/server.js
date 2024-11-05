@@ -126,6 +126,75 @@ app.get('/api/protected-route', (req, res) => {
     }
   });
 });
+
+
+app.get('/api/followlistuser/:userID', (req, res) => {
+  const userID = req.params.userID; // Use userID from params
+  
+  const query = `
+    SELECT u.* FROM follow_list p
+    LEFT JOIN user u ON p.follower_id = u.id 
+    WHERE p.userid = ?;`;
+
+  db.query(query, [userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
+
+app.get('/api/userchat/:userID/:followingid', (req, res) => {
+  const userID = req.params.userID; // Extract userID from params
+  const followingid = req.params.followingid; // Extract followingid from params
+  
+  const query = `
+    SELECT u.user_profile , u.name , u.email , u.pro_pic , p.*
+    FROM messages p
+    LEFT JOIN user u ON p.from_user_id = u.id 
+    WHERE (p.from_user_id = ? AND p.to_user_id = ?) 
+       OR (p.from_user_id = ? AND p.to_user_id = ?);`;
+
+  db.query(query, [userID, followingid, followingid, userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
+
+app.get('/api/userByuserid/:userID', (req, res) => {
+  const userID = req.params.userID; // Use userID from params
+  
+  const query = `
+    SELECT * FROM user WHERE id = ? ;`;
+
+  db.query(query, [userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
+
+app.post('/api/sendmessage', async (req, res) => {
+  const { senderid, receiverid, messageText} = req.body;
+  const createdAt = new Date();
+
+  try {
+
+    await db.query('INSERT INTO messages (msg, from_user_id, to_user_id, 	create_at) VALUES (?, ?, ?, ? )', [messageText, senderid, receiverid, createdAt ]);
+    res.status(200).json({ message: 'message saved successfully!' });
+
+  } catch (error) {
+    console.error('Error saving rating:', error);
+    res.status(500).json({ message: 'Failed to save message' });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

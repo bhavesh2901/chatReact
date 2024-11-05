@@ -8,6 +8,7 @@ import Landingpage from './page/Landingpage/Landingpage';
 import LoginSignup from './page/Login/Login';
 import Pagenotfound from './page/Pagenotfound/Pagenotfound';
 import { UserProvider , useUser } from './UserContext';
+import { ToastContainer, toast } from 'react-toastify';
 
 function App() {
   
@@ -35,6 +36,7 @@ function App() {
   }, [setUser]);
   return (
     <BrowserRouter>
+      <ToastContainer position="top-right" autoClose={1000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
       <Routes>
         <Route path="/loginsignup" element={<LoginSignup />} />
         <Route path="/chatapp" element={<ChatApp />} />

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
 import { UserProvider , useUser} from '../../UserContext';
-
+import { useNavigate } from 'react-router-dom';
 // import liveChatImage from '../assets/livechat.png';
 const Header = () => {
   const { user } = useUser();
+  const navigate = useNavigate();
   let fullname = '';
     let name = '';
     let UserID = '';
@@ -16,7 +17,7 @@ const Header = () => {
     let collage = '';
     let City = '';
     let maritalstatus = '';
-    let bippic = '';
+    let biopic = '';
     let joining = '';
     let gender = '';
  
@@ -31,23 +32,32 @@ const Header = () => {
         collage =   user['collage']
         City =   user['city']
         maritalstatus =   user['marital_status']
-        bippic =    user['bio_pic']
+        biopic =    user['bio_pic']
         joining =   user['createat']
         gender =   user['gender']==1 ? 'male' : 'female';
     }
+    const [statusname , setStatusname] = useState(true);
+    const handleLogout = () => {
+      // Remove the token from localStorage
+      localStorage.removeItem('chatToken');
+      window.location.reload();
+      navigate('/chatapp', { state: { user: user } });
+    };
+  
+   
   return (
     <>
-<div class="offcanvas offcanvas-start mx-2 rounded" style={{backgroundColor : "transparent"}} data-bs-backdrop="static" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
+<div class="offcanvas offcanvas-start mx-2 shadow" style={{backgroundColor : "#8a8888" , borderRadius :'40px'}} data-bs-backdrop="false" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
   <div class="">
-  <button type="button" class="btn position-absolute  fs-10 translate-middle rounded  fs-5" style={{ top: "30px" , left: "362px" , zIndex : '99'}}  data-bs-dismiss="offcanvas" aria-label="Close"><i class="fa-solid fa-xmark text-white"></i></button>
+  <button type="button" class="btn position-absolute  fs-10 translate-middle rounded  fs-5" onClick={()=>setStatusname(true)} style={{ top: "30px" , left: "362px" , zIndex : '99'}}  data-bs-dismiss="offcanvas" aria-label="Close"><i class="fa-solid fa-xmark text-white"></i></button>
     <div className='profile-top  p-2' style={{ borderRadius : '40px'}}>
       <div class="bg-dark p-2" style={{ borderRadius : '40px'}}  >
-        <img className='rounded' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTwLB24lNu8iQBCTwWtEcZ5TtlEAJT6YR0Fg&s" style={{ borderRadius : '40px'}} height='150' class="card-img-top" alt="..."/>
+        <img className='rounded' src={biopic ? biopic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTu9pPTi6sJYwiM_MHafuDFQczkTQJABENfg&s"} style={{ borderRadius : '40px'}} height='150' class="card-img-top" alt="..."/>
           <div class="text-center position-absolute  fs-10 translate-middle rounded  fs-5" style={{ top: "146px" , left: "200px"}}>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9us0MxB35Wv3z03TJFrxhub-WyxqpBKAsjQ&s" height="100" width="100" class="rounded-circle" alt="..."/>
+            <img src={userPhoto ? userPhoto : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s"} height="100" width="100" class="rounded-circle" alt="..."/>
           </div>
-          <div className='text-center mt-5 text-white'> bhavesh </div>
-          <div className='text-center mt-1 text-white mb-2'> chavdabhavesh2901@gmail.com </div>
+          <div className='text-center mt-5 text-white'> {fullname} </div>
+          <div className='text-center mt-1 text-white mb-2'> {email}</div>
       </div>
     </div>
     <div className='profile=-middle p-2'>
@@ -82,7 +92,7 @@ const Header = () => {
     </div>
     <div className='profile-bottom mt-5'>
         <div className='d-flex' style={{ borderRadius : '40px'}}>
-          <button className='w-100 py-2 btn btn-outline-danger rounded-pill mx-3 border border-danger text-white'><i class="fa-solid fa-power-off mx-2"></i> Logout</button>
+          <button   onClick={handleLogout}  className='w-100 py-2 btn btn-outline-danger bg-dark rounded-pill mx-3 border border-danger text-white'><i class="fa-solid fa-power-off mx-2"></i> Logout</button>
         </div>
     </div>
   </div>
@@ -122,11 +132,21 @@ const Header = () => {
       </div>
       <div className='float-end text-white'>
             {/* <img src=''></img> */}
-            <div className='rounded-pill d-flex bg-primary p-1 collapse navbar-collapse' data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop" aria-controls="staticBackdrop" style={{alignItems: 'center'}}>
-              <div className='rounded-circle bg-white' style={{ height: '30px' , width: '30px' , alignItems: 'center' , display: 'flex'}}>
-                <center><i class="fa-solid fa-user text-dark mx-2"></i></center> 
-              </div>
-              <div className='mx-2'>{name}</div>
+            <div className='rounded-pill d-flex bg-primary p-1 collapse navbar-collapse' onClick={()=>setStatusname(false)} data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop" aria-controls="staticBackdrop" style={{alignItems: 'center'}}>
+              {
+                userPhoto ?
+                (<img src={userPhoto} height='40' style={{borderRadius: '50%'}} width='40'></img> )
+                :
+                (
+                  <> 
+                    <div className='rounded-circle bg-white' style={{ height: '30px' , width: '30px' , alignItems: 'center' , display: 'flex'}}>
+                    <center><i class="fa-solid fa-user text-dark mx-2"></i></center> 
+                    </div>
+                  </>
+                )
+              }
+             
+              <div className={`mx-2 ${statusname ? 'show' : 'hide'}`}>{name}</div>
             </div>
             
       </div>

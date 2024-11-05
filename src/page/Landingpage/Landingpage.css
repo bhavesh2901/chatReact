@@ -27,7 +27,7 @@ a {
   text-decoration: none;
 }
 
-body::before,body::after
+.bg-my::before,.bg-my::after
 {
     content: "";
     height: 90vh;
@@ -35,14 +35,14 @@ body::before,body::after
     position: absolute;
     z-index: -10;
 }
-body::before
+.bg-my::before
 {
     top: 0;
     left: -5rem;
     background: linear-gradient(to right, #B63EFF,#C640FF);
     border-radius: 0 0 16rem 16rem;
 }
-body::after
+.bg-my::after
 {
     bottom: 0;
     right: -5rem;

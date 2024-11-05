@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect } from 'react';
 import './ChatApp.css'; 
 import Header from '../Header/Header';
+import axios from 'axios';
 import { UserProvider ,useUser } from '../../UserContext';
+import Chatcontainer from '../../components/Chatcontainer/Chatcontainer';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const ChatApp = () => {
     const [showBox, setShowBox] = useState(false);
     const { user } = useUser();
+    const [followuser,setFollowuser] = useState([]);
+    const [followingId,setFollowingId] = useState([]);
+    const [userbyuseriddata,setUserbyuseriddata] = useState([]);
+    const [messageText,setMessageText] = useState('');
     const handleChatListClick = () => {
       setShowBox(true);
     };
+    const [userchat, setUserchat] = useState([]);
     let fullname = '';
     let name = '';
     let UserID = '';
@@ -43,6 +51,80 @@ const ChatApp = () => {
     const handleChatIconClick = () => {
       setShowBox(false);
     };
+
+  
+    const loadChat = async (id) => {
+
+        try {
+            const response = await axios.get(`http://localhost:3000/api/userByuserid/${id}`);
+            console.log(response);
+            setUserbyuseriddata(response.data[0]);
+        } catch (error) {
+            console.error('Error fetching user chat status:', error);
+        }
+
+        try {
+          const response = await axios.get(`http://localhost:3000/api/userchat/${UserID}/${id}`);
+          console.log(response);
+          setUserchat(response.data);
+        } catch (error) {
+          console.error('Error fetching user chat status:', error);
+        }
+    };
+    const fetchfollouser = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/followlistuser/${UserID}`);
+          setFollowuser(response.data); // Assuming the API returns { isInWishlist: true/false }
+        } catch (error) {
+          console.error('Error follouser wishlist status:', error);
+        }
+      };
+  
+      // Fetch the wishlist status on component mount
+    
+      useEffect(() => {
+        fetchfollouser();
+      }, [UserID]);
+
+    const sendMessge = async (id) => 
+    {
+        if(id!='' && messageText!=''){
+            try {
+              await axios.post('http://localhost:3000/api/sendmessage', {
+                senderid : UserID,
+                receiverid : id,
+                messageText: messageText
+              });
+              setMessageText('');
+              loadChat(id);
+            } catch (error) {
+              console.error('Error submitting rating:', error);
+              toast('❌ SOMETHING WRONG', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+              });
+            }
+          }
+          else
+          {
+            toast.info('please enter message', {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+          }
+    }
   return (
     <>
      <Header/>
@@ -78,153 +160,30 @@ const ChatApp = () => {
                                                 <div class="tab-pane fade show active" id="Open" role="tabpanel" aria-labelledby="Open-tab">
                                                   
                                                     <div class="chat-list">
-                                                        <a onClick={(e) => { e.preventDefault(); handleChatListClick(); }} href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                                <span class="active"></span>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Mehedi Hasan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Ryhan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Malek Hasan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Sadik Hasan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Bulu </h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Maria SK</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Dipa Hasan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Jhon Hasan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Tumpa Moni</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Payel Akter</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Baby Akter</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Zuwel Rana</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Habib </h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Jalal Ahmed</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Hasan Ali</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#" class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0">
-                                                                <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                            </div>
-                                                            <div class="flex-grow-1 ms-3">
-                                                                <h3>Mehedi Hasan</h3>
-                                                                <p>front end developer</p>
-                                                            </div>
-                                                        </a>
+                                                    {followuser.length !== 0 ? (
+                                                        followuser.map((item, index) => (
+                                                            item.id != null ?
+                                                            (
+                                                                <>
+                                                                    <a onClick={(e) => { e.preventDefault(); handleChatListClick(); loadChat(item.id) }} key={item.id} href="#" className="d-flex align-items-center mt-2">
+                                                                        <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                            <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.pro_pic ? item.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
+                                                                            <span className="active"></span>
+                                                                        </div>
+                                                                        <div className="flex-grow-1 ms-3">
+                                                                            <h3>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
+                                                                            <p>front end developer</p>
+                                                                        </div>
+                                                                    </a>
+                                                                </>
+                                                            ):
+                                                            (<div></div>)
+                                                        ))
+                                                    ) : (
+                                                        <div>No Message At</div>
+                                                    )}
 
-
+                                                        
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="Closed" role="tabpanel" aria-labelledby="Closed-tab">
@@ -383,20 +342,30 @@ const ChatApp = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className={`chatbox ${showBox ? 'showbox' : ''}`}>
-                            <div class="modal-dialog-scrollable">
+                            <div className={`chatbox ${showBox ? 'showbox' : ''}`}>   <div class="modal-dialog-scrollable">
                                 <div class="modal-content">
                                     <div class="msg-head">
                                         <div class="row">
                                             <div class="col-8">
                                                 <div class="d-flex align-items-center">
                                                     <span class="chat-icon" onClick={handleChatIconClick} ><img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/arroleftt.svg" alt="image title"/></span>
-                                                    <div class="flex-shrink-0">
-                                                        <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/user.png" alt="user img"/>
-                                                    </div>
+                                                   
+                                                      {
+                                                        userbyuseriddata.length!=0? 
+                                                        ( <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                            <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={userbyuseriddata.pro_pic ? userbyuseriddata.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
+                                                          </div>
+                                                        )
+                                                        :
+                                                        (
+                                                            <div></div>
+                                                        )
+                                                      }
+                                                        <span className="active"></span>
+                                                  
                                                     <div class="flex-grow-1 ms-3">
-                                                        <h3>Mehedi Hasan</h3>
-                                                        <p>front end developer</p>
+                                                        <h3>{userbyuseriddata.user_profile !=null ? userbyuseriddata.user_profile  : userbyuseriddata.mobail? userbyuseriddata.mobail : userbyuseriddata.name }</h3>
+                                                        <p>{userbyuseriddata.email}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -417,60 +386,65 @@ const ChatApp = () => {
                                             </div>
                                         </div>
                                     </div>
-
-
                                     <div class="modal-body">
-                                        <div class="msg-body">
+                                        <div class="msg-body mx-3">
+                                            {
+                                                userbyuseriddata.length==0?
+                                                (<div>welcome</div>)
+                                                :
+                                                (<div></div>)
+                                            }
+                                           {userchat.length !== 0 ? (
                                             <ul>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">10:06 am</span>
-                                                </li>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">10:16 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p>yes!</p>
-                                                    <span class="time">10:20 am</span>
-                                                </li>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">10:26 am</span>
-                                                </li>
-                                                <li class="sender">
-                                                    <p> Hey, Are you there? </p>
-                                                    <span class="time">10:32 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p>How are you?</p>
-                                                    <span class="time">10:35 am</span>
-                                                </li>
-                                                <li>
-                                                    <div class="divider">
-                                                        <h6>Today</h6>
-                                                    </div>
-                                                </li>
+                                                {userchat.reduce((acc, item, index) => {
+                                                    const messageDate = new Date(item.create_at);
+                                                    const today = new Date();
+                                                    const diffInTime = today.setHours(0, 0, 0, 0) - messageDate.setHours(0, 0, 0, 0);
+                                                    const diffInDays = diffInTime / (1000 * 3600 * 24);
+                                                    const formattedTime = messageDate.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-                                                <li class="repaly">
-                                                    <p> yes, tell me</p>
-                                                    <span class="time">10:36 am</span>
-                                                </li>
-                                                <li class="repaly">
-                                                    <p>yes... on it</p>
-                                                    <span class="time">junt now</span>
-                                                </li>
+                                                    // Determine the header for today, yesterday, or older
+                                                    if (diffInDays === 0 && !acc.todayHeaderShown) {
+                                                        acc.items.push(<div className="divider" key={`header-today-${index}`}><h6>Today</h6></div>);
+                                                        acc.todayHeaderShown = true; // Set the flag to indicate that the header has been displayed
+                                                    } else if (diffInDays === 1 && !acc.yesterdayHeaderShown) {
+                                                        acc.items.push(<div className="divider" key={`header-yesterday-${index}`}><h6>Yesterday</h6></div>);
+                                                        acc.yesterdayHeaderShown = true; // Set the flag for yesterday header
+                                                    } else if (diffInDays > 1 && !acc.otherDatesHeaders.includes(messageDate.toLocaleDateString())) {
+                                                        acc.items.push(<div className="divider" key={`header-${messageDate.toLocaleDateString()}`}><h6>{messageDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</h6></div>);
+                                                        acc.otherDatesHeaders.push(messageDate.toLocaleDateString()); // Keep track of displayed headers for other dates
+                                                    }
 
+                                                    acc.items.push(
+                                                        <li className={UserID === item.from_user_id ? "repaly" : "sender"} key={index}>
+                                                            <div>
+                                                                <p>{item.msg}</p>
+                                                                <span className="time">{formattedTime}</span>
+                                                            </div>
+                                                        </li>
+                                                    );
+
+                                                    return acc;
+                                                }, { items: [], todayHeaderShown: false, yesterdayHeaderShown: false, otherDatesHeaders: [] }).items}
                                             </ul>
+                                        ) : (
+                                            <div></div>
+                                        )}
+
+
                                         </div>
                                     </div>
-
-
                                     <div class="send-box">
                                         <form action="">
-                                            <input type="text" class="form-control" aria-label="message…" placeholder="Write message…"/>
+                                        {userbyuseriddata.user_profile !=null ?
+                                            ( <>
+                                                        <input type="text" onChange={e=>setMessageText(e.target.value)} value={messageText} class="form-control" aria-label="message…" placeholder="Write message…"/>
 
-                                            <button type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+                                                        <button onClick={()=>sendMessge(userbyuseriddata.id)} type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+                                                </>)
+                                            :
+                                            (<div></div>)
+                                        }
                                         </form>
 
                                         <div class="send-btns">
