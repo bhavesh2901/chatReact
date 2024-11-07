@@ -197,8 +197,9 @@ message-area
 .message-area {
     height: 90vh;
     overflow: hidden;
-    padding: 30px 0;
+    padding: 13px 0;
     background: #f5f5f5;
+    border-radius: 10px;
 }
 
 .chat-area {
@@ -702,6 +703,21 @@ button:focus {
     display: none;
 }
 
+.message-area  .mobile {
+    width: 17rem;
+    min-width: 17rem;
+    overflow: hidden;
+    padding: 0.6rem;
+    border-radius: 2rem;
+    box-shadow: 10px 15px 40px #00000030;
+    background: white;
+    top: 0rem;
+    position: absolute;
+    left: 0rem;
+    left: 661px;
+    top: 56px;
+    height: 559px;
+}
 
 
 @media (max-width: 767px) {
@@ -720,6 +736,11 @@ button:focus {
         background: #fff;
         transition: all 0.5s ease;
         border-left: none;
+    }
+
+    #offcanvasStart
+    {
+        display: none !important;
     }
     .showbox {
         left: 0 !important;
@@ -761,3 +782,68 @@ button:focus {
         border-bottom-left-radius: 6px;
     }
 }
+.welcome-bg
+{
+    background: linear-gradient(135deg, #6176ca, #76d6a2);
+    border-radius: 20px;
+}
+
+
+ 
+  
+  /* User Profile Photo with Bounce and Shadow Pulse */
+  .user-photo {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #4a90e2;
+    animation: bounce 2s infinite, shadowPulse 2s infinite alternate;
+  }
+  
+  /* Bounce and Shadow Pulse Animation */
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shadowPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+    50% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); }
+  }
+  
+  /* Fade-in Text Animation */
+  .fade-in-text {
+    opacity: 0;
+    animation: fadeInText 1.5s forwards;
+  }
+  @keyframes fadeInText {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Rotating and Floating Phone Icon Animation */
+  .animated-rotate-float {
+    animation: rotate 5s linear infinite, float 3s ease-in-out infinite;
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  
+  /* Button Hover Scale Animation */
+  .animated-hover {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  .animated-hover:hover {
+    transform: scale(1.1);
+    background-color: #357ab8;
+  }
+  
+  /* Fade In Box */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  

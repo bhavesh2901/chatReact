@@ -195,6 +195,44 @@ app.post('/api/sendmessage', async (req, res) => {
   }
 });
 
+
+app.post('/api/outModeTheame', async (req, res) => {
+  const { UserID, theme} = req.body;
+
+  try {
+
+    await db.query(
+      'UPDATE user SET mscolor = ? WHERE id = ?',
+      [theme, UserID]
+    );
+    res.status(200).json({ message: 'theme saved successfully!' });
+
+  } catch (error) {
+    console.error('Error saving rating:', error);
+    res.status(500).json({ message: 'Failed to save message' });
+  }
+});
+
+
+app.post('/api/chatTheam', async (req, res) => {
+  const { UserID, theme} = req.body;
+
+  try {
+
+    await db.query(
+      'UPDATE user SET msthem = ? WHERE id = ?',
+      [theme, UserID]
+    );
+    res.status(200).json({ message: ' chat theme saved successfully!' });
+
+  } catch (error) {
+    console.error('Error saving rating:', error);
+    res.status(500).json({ message: 'Failed to save message' });
+  }
+});
+
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

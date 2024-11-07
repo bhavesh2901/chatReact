@@ -3,10 +3,34 @@ import { Link } from 'react-router-dom';
 import './Header.css';
 import { UserProvider , useUser} from '../../UserContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 // import liveChatImage from '../assets/livechat.png';
 const Header = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+
+  const setBodyBackgroundColor = async (color) => {
+    document.body.style.background = color;
+      try {
+        await axios.post('http://localhost:3000/api/outModeTheame', {
+          UserID : UserID,
+          theme : color,
+        });
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+        toast('❌ SOMETHING WRONG', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+  };
   let fullname = '';
     let name = '';
     let UserID = '';
@@ -64,10 +88,12 @@ const Header = () => {
       <div className='row'>
           <div className='col-lg-6'>
               <div className='p-2 bg-dark d-flex' style={{ borderRadius : '40px'}}>
-                <div class="form-check form-switch mx-3 fs-3">
-                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"/>
+                <div className='d-flex gap-2'>
+                      <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => setBodyBackgroundColor('linear-gradient(135deg, rgb(110, 115, 183), rgb(49, 230, 202))')} style={{height : '35px', width: '35px' , background : 'linear-gradient(135deg, rgb(110 115 183), rgb(49 230 202))'}}></div>
+                      <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => setBodyBackgroundColor('linear-gradient(135deg, rgb(109 35 151 / 79%), rgb(140 22 83 / 87%)')} style={{height : '35px', width: '35px' , background : 'linear-gradient(135deg, rgb(109 35 151 / 79%), rgb(140 22 83 / 87%)'}}></div>
+                      <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => setBodyBackgroundColor('linear-gradient(135deg, rgb(17 17 18 / 79%), rgb(41 40 40))')} style={{height : '35px', width: '35px' , background : 'linear-gradient(135deg, rgb(17 17 18 / 79%), rgb(41 40 40))'}}></div>
+                      <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => setBodyBackgroundColor('linear-gradient(135deg, rgb(167 89 159 / 79%), rgb(64 156 176))')} style={{height : '35px', width: '35px' , background : 'linear-gradient(135deg, rgb(167 89 159 / 79%), rgb(64 156 176))'}}></div>
                 </div>
-                <label class="form-check-label text-white fs-10 mt-2" for="flexSwitchCheckDefault">Mode</label>
               </div>
           </div>
           <div className='col-lg-6'>
@@ -98,7 +124,7 @@ const Header = () => {
   </div>
 </div>
 <header>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
       <a class="" href="#" ><img src='/assets/Facebook_Messenger-512.webp' height='30' width='30'></img></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,7 +156,7 @@ const Header = () => {
           </li>
         </ul>
       </div>
-      <div className='float-end text-white'>
+      <div className='float-end d-flex align-items-center justify-content-center text-white'>
             {/* <img src=''></img> */}
             <div className='rounded-pill d-flex bg-primary p-1 collapse navbar-collapse' onClick={()=>setStatusname(false)} data-bs-toggle="offcanvas" data-bs-target="#staticBackdrop" aria-controls="staticBackdrop" style={{alignItems: 'center'}}>
               {

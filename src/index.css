@@ -12,3 +12,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px; /* This controls the scrollbar's width (vertical) and height (horizontal) */
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background-color: #e8eefa;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b6c9ee;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
