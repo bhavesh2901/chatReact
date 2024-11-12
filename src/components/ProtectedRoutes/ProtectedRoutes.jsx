@@ -27,7 +27,15 @@ const ProtectedRoutes = ({ children }) => {
         {
             navigate('/chatapp');
         }
+        else
+        {
+          navigate('/')
+        }
         document.body.style.background = response.data.user.mscolor;
+        const divs = document.getElementsByClassName("chat-area");
+        Array.from(divs).forEach(div => {
+          div.style.backgroundColor = response.data.user.msthem ;
+        });
       } catch (err) {
         console.error('Fetch error:', err);
         navigate('/loginsignup');

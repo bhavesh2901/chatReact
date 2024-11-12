@@ -17,7 +17,7 @@ const VideoPlayer = ({videoUrls}) => {
         <div>
       <div className="chat-messages">
           <div  onClick={() => openVideo(videoUrls)} style={{ cursor: "pointer" }}>
-            <video width="200" height="130" controls>
+            <video style={{borderRadius :'20px'}} width="200" height="130" controls>
               <source src={videoUrls} type="video/mp4"/>
               <source src={videoUrls} type="video/ogg"/>
             </video>
@@ -43,6 +43,7 @@ const VideoPlayer = ({videoUrls}) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+             borderRadius :'20px'
           },
         }}
       >

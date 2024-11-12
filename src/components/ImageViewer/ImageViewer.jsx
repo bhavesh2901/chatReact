@@ -15,7 +15,7 @@ const ImageViewer = ({ imageUrls }) => {
       <div>
         <div className="chat-messages">
           <div onClick={() => openImage(imageUrls)} style={{ cursor: 'pointer' }}>
-            <img src={imageUrls} alt="Thumbnail" width="200" height="130" />
+            <img style={{borderRadius :'20px'}} src={imageUrls} alt="Thumbnail" width="200" height="130" />
           </div>
         </div>
 
@@ -27,17 +27,20 @@ const ImageViewer = ({ imageUrls }) => {
             overlay: {
               backgroundColor: 'rgba(0, 0, 0, 0.2)', // Overlay background color
               zIndex: 9999, // To ensure it's on top of everything
+              borderRadius :'20px',
+             
             },
             content: {
               maxWidth: '80%', // Adjust max width of the modal
               maxHeight: '80%', // Adjust max height of the modal
               margin: 'auto',
-              padding: 0,
+               padding: '30px',
               border: 'none',
               backgroundColor: 'black',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
+              borderRadius :'20px'
             },
           }}
         >

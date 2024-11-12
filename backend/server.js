@@ -2,10 +2,11 @@ const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
 const crypto = require('crypto'); 
-
+const path = require("path");
 const app = express();
 const PORT = 3000; // You can choose any available port
-
+const multer = require('multer');
+const fs = require('fs');
 // Middleware
 app.use(cors());
 app.use(express.json()); // To parse JSON data
@@ -131,10 +132,28 @@ app.get('/api/protected-route', (req, res) => {
 app.get('/api/followlistuser/:userID', (req, res) => {
   const userID = req.params.userID; // Use userID from params
   
-  const query = `
-    SELECT u.* FROM follow_list p
-    LEFT JOIN user u ON p.follower_id = u.id 
-    WHERE p.userid = ?;`;
+  // const query = ` SELECT u.* FROM follow_list p LEFT JOIN user u ON p.follower_id = u.id WHERE p.userid = ?;`;
+  const query = ` SELECT u.*, c.msg, c.create_at, c.photo, c.video
+FROM follow_list f1
+JOIN follow_list f2 
+  ON f1.userid = f2.follower_id 
+  AND f1.follower_id = f2.userid
+LEFT JOIN user u ON f1.userid = u.id
+LEFT JOIN messages c 
+  ON (c.from_user_id = f1.follower_id AND c.to_user_id = f1.userid)
+  OR (c.from_user_id = f1.userid AND c.to_user_id = f1.follower_id)
+WHERE f1.follower_id = ?
+  AND c.create_at = (
+      SELECT MAX(create_at)
+      FROM messages
+      WHERE (from_user_id = f1.follower_id AND to_user_id = f1.userid)
+         OR (from_user_id = f1.userid AND to_user_id = f1.follower_id)
+  )
+ORDER BY u.id;
+;
+
+    `;
+
 
   db.query(query, [userID], (err, results) => {
     if (err) {
@@ -155,6 +174,8 @@ app.get('/api/userchat/:userID/:followingid', (req, res) => {
     LEFT JOIN user u ON p.from_user_id = u.id 
     WHERE (p.from_user_id = ? AND p.to_user_id = ?) 
        OR (p.from_user_id = ? AND p.to_user_id = ?);`;
+
+       
 
   db.query(query, [userID, followingid, followingid, userID], (err, results) => {
     if (err) {
@@ -231,7 +252,82 @@ app.post('/api/chatTheam', async (req, res) => {
   }
 });
 
+const dir = path.resolve(__dirname, '..', 'public', 'assets', 'chatPhoto');
 
+// Function to generate a random token for the filename
+const generatename = () => {
+  return Math.random().toString(36).substr(2, 9) + Date.now(); // Add current timestamp to make it unique
+};
+
+// Create the destination directory if it doesn't exist
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+// Configure multer for storage and filename handling
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, dir); // Use the absolute path for the destination
+  },
+  filename: (req, file, cb) => {
+    const randomname = generatename(); // Generate a new random name for each image upload
+    const newFilename = `${randomname}.jpg`; // Save as JPG format
+    cb(null, newFilename); // Save the file with the new filename
+  },
+});
+
+const upload = multer({ storage });
+
+// Route to upload image
+app.post('/api/uploadphoto/:senderid/:receiverid', upload.single('image'), (req, res) => {
+  const { senderid, receiverid } = req.params; // Extract userid from params
+  const image = req.file;
+  const createdAt = new Date();
+  
+  if (!image) {
+    return res.status(400).json({ message: 'No image uploaded' });
+  }
+  
+  const imagePath = path.join('assets/chatPhoto/', image.filename); // Use the generated filename from multer
+
+  // Save the image path in the database
+  const query = 'INSERT INTO messages (photo, from_user_id, to_user_id, create_at) VALUES (?, ?, ?, ?)';
+  db.query(query, [imagePath, senderid, receiverid, createdAt], (err, result) => {
+    if (err) {
+      console.error('Error updating image path:', err);
+      return res.status(500).json({ message: 'Database update failed' });
+    }
+    res.json({ message: 'Image uploaded successfully', imagePath });
+  });
+});
+
+
+
+
+
+app.get('/api/AlluserByUser/:userID', (req, res) => {
+  const userID = req.params.userID; // Use userID from params
+  
+  const query = `SELECT DISTINCT u.*
+FROM user u
+LEFT JOIN follow_list f ON u.id = f.userid
+WHERE u.id != ?
+  AND u.id NOT IN (
+      SELECT userid
+      FROM follow_list
+      WHERE follower_id = ?
+  );
+
+ `;
+
+  db.query(query, [userID ,userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
 
 // Start the server
 app.listen(PORT, () => {

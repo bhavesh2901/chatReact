@@ -7,11 +7,12 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 // import liveChatImage from '../assets/livechat.png';
 const Header = () => {
-  const { user } = useUser();
+  const { user ,setUser } = useUser();
   const navigate = useNavigate();
 
   const setBodyBackgroundColor = async (color) => {
     document.body.style.background = color;
+    
       try {
         await axios.post('http://localhost:3000/api/outModeTheame', {
           UserID : UserID,
@@ -64,8 +65,8 @@ const Header = () => {
     const handleLogout = () => {
       // Remove the token from localStorage
       localStorage.removeItem('chatToken');
-      window.location.reload();
-      navigate('/chatapp', { state: { user: user } });
+      navigate('/');
+      setUser('');
     };
   
    

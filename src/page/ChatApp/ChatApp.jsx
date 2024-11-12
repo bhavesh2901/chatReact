@@ -10,7 +10,9 @@ import { Fade, Zoom } from 'react-awesome-reveal';
 import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
 import ImageViewer from '../../components/ImageViewer/ImageViewer';
 import Rightsidebar from '../../components/Rightsidebar/Rightsidebar';
-import { TwitterPicker } from 'react-color';
+import { TwitterPicker,  AlphaPicker ,BlockPicker ,ChromePicker, CirclePicker ,CompactPicker, GithubPicker, HuePicker ,MaterialPicker, PhotoshopPicker, SketchPicker, SliderPicker, SwatchesPicker} from 'react-color';
+import { useDropzone } from 'react-dropzone';
+import FollowBtn from '../../components/FollowBtn/FollowBtn';
 
 const ChatApp = () => {
     const [showBox, setShowBox] = useState(false);
@@ -20,15 +22,22 @@ const ChatApp = () => {
     const [userbyuseriddata,setUserbyuseriddata] = useState([]);
     const [messageText,setMessageText] = useState('');
     const [messagetheam,setMessagetheam] = useState('');
+    const [fetchUser,setFetchUser] = useState('');
 
     const handleChatListClick = () => {
       setShowBox(true);
     };
-    const lightColors = [
-        "#FFB3B3", "#FFCCCC", "#FFCC99", "#FFFF99", "#CCFFCC",
-        "#CCFFFF", "#B3E0FF", "#B3B3FF", "#E6B3FF", "#FFB3E6"
-      ];
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (e) => {
     
+      setFile(e.target.files[0]);
+    };
+      const lightColors = [
+        "#FFDFDF", "#FFE6E6", "#FFE0CC", "#FFFFCC", "#E6FFE6",
+        "#E6FFFF", "#D9F2FF", "#D9D9FF", "#F2D9FF", "#FFD9F2"
+      ];
+      
 
     const [userchat, setUserchat] = useState([]);
     let fullname = '';
@@ -44,7 +53,8 @@ const ChatApp = () => {
     let bippic = '';
     let joining = '';
     let gender = '';
-    let msthem = '';
+    let msthem = ''; 
+    let mscolor = ''; 
  
     if (user) {
         fullname =   user['user_profile']
@@ -61,22 +71,33 @@ const ChatApp = () => {
         joining =   user['createat']
         gender =   user['gender']
         msthem =   user['msthem']
+        mscolor =   user['mscolor']
     }
   
     const handleChatIconClick = () => {
       setShowBox(false);
     };
-
-
+   
+  
+    setTimeout(() => {
+        const divs3 = document.getElementsByClassName("repaly"); // Remove the dot prefix
+        Array.from(divs3).forEach(div3 => {
+        const pElement = div3.querySelector("p"); // Select the <p> element inside each .repaly
+        if (pElement) {
+            pElement.style.background = mscolor; // Set the background color on <p>
+        }
+        });
+    }, 1000);
 
     const setBodyBackgroundColor =  async ()=>
     {
         if(messagetheam.length!==0)
         {
-            const divs = document.getElementsByClassName("msg-body");
+            const divs = document.getElementsByClassName("chat-area");
             Array.from(divs).forEach(div => {
               div.style.backgroundColor =messagetheam ;
             });
+            
             try {
                 await axios.post('http://localhost:3000/api/chatTheam', {
                     UserID : UserID,
@@ -100,26 +121,44 @@ const ChatApp = () => {
     }
   
     const loadChat = async (id) => {
-        const divs = document.getElementsByClassName("msg-body");
-        Array.from(divs).forEach(div => {
-          div.style.backgroundColor =msthem ;
-        });
+      
+        setTimeout(() => {
+            const divs3 = document.getElementsByClassName("repaly"); // Remove the dot prefix
+            Array.from(divs3).forEach(div3 => {
+            const pElement = div3.querySelector("p"); // Select the <p> element inside each .repaly
+            if (pElement) {
+                pElement.style.background = mscolor; // Set the background color on <p>
+            }
+            });
+        }, 500);
+            
+     
         try {
             const response = await axios.get(`http://localhost:3000/api/userByuserid/${id}`);
-            console.log(response);
             setUserbyuseriddata(response.data[0]);
         } catch (error) {
             console.error('Error fetching user chat status:', error);
         }
 
         try {
-          const response = await axios.get(`http://localhost:3000/api/userchat/${UserID}/${id}`);
-          console.log(response);
-          setUserchat(response.data);
+            const response = await axios.get(`http://localhost:3000/api/userchat/${UserID}/${id}`);
+            setUserchat(response.data);
         } catch (error) {
-          console.error('Error fetching user chat status:', error);
-        }
+            console.error('Error fetching user chat status:', error);
+        }      
     };
+
+    useEffect(() => {
+        if (followingId) {
+            const intervalId = setInterval(() => {
+                loadChat(followingId); 
+                fetchfollouser();
+            }, 1000);
+            return () => clearInterval(intervalId);
+        }
+    }, [followingId]);
+
+
     const fetchfollouser = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/api/followlistuser/${UserID}`);
@@ -137,6 +176,35 @@ const ChatApp = () => {
 
     const sendMessge = async (id) => 
     {
+        var formData ='';
+         formData = new FormData();
+        formData.append('image', file);
+        if(formData)
+        {
+            axios.post(`http://localhost:3000/api/uploadphoto/${UserID}/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then((response) => {
+                toast.success('Upload successfully', {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+                setFile(null);
+                console.log('Image uploaded successfully:', response.data);
+            })
+            .catch((error) => {
+                console.error('Error uploading image:', error);
+            });
+        }
+       
         if(id!='' && messageText!=''){
             try {
               await axios.post('http://localhost:3000/api/sendmessage', {
@@ -160,20 +228,23 @@ const ChatApp = () => {
               });
             }
           }
-          else
-          {
-            toast.info('please enter message', {
-              position: "top-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-            });
-          }
     }
+
+    
+    const fetchuser = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/AlluserByUser/${UserID}`);
+          setFetchUser(response.data); // Assuming the API returns { isInWishlist: true/false }
+        } catch (error) {
+          console.error('Error AlluserByUser:', error);
+        }
+      };
+  
+      // Fetch the wishlist status on component mount
+    
+      useEffect(() => {
+        fetchuser();
+      }, [UserID]);
   return (
     <>
      <Header/>
@@ -194,10 +265,10 @@ const ChatApp = () => {
 
                                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                                                 <li class="nav-item" role="presentation">
-                                                    <button class="nav-link active" id="Open-tab" data-bs-toggle="tab" data-bs-target="#Open" type="button" role="tab" aria-controls="Open" aria-selected="true">Open</button>
+                                                    <button class="nav-link active" id="Open-tab" data-bs-toggle="tab" data-bs-target="#Open" type="button" role="tab" aria-controls="Open" aria-selected="true">Chat</button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
-                                                    <button class="nav-link" id="Closed-tab" data-bs-toggle="tab" data-bs-target="#Closed" type="button" role="tab" aria-controls="Closed" aria-selected="false">Closed</button>
+                                                    <button class="nav-link" id="Closed-tab" data-bs-toggle="tab" data-bs-target="#Closed" type="button" role="tab" aria-controls="Closed" aria-selected="false">Follow</button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -214,14 +285,23 @@ const ChatApp = () => {
                                                                 item.id != null ?
                                                                 (
                                                                     <>
-                                                                        <a onClick={(e) => { e.preventDefault(); handleChatListClick(); loadChat(item.id) }} key={item.id} className="d-flex align-items-center mt-2" data-bs-toggle="offcanvas" href="#offcanvasStart" role="button" aria-controls="offcanvasStart">
+                                                                        <a onClick={(e) => { e.preventDefault(); handleChatListClick(); setFollowingId(item.id); loadChat(item.id) }} key={item.id} className="d-flex align-items-center mt-4" data-bs-toggle="offcanvas" href="#offcanvasStart" role="button" aria-controls="offcanvasStart">
                                                                             <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
                                                                                 <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.pro_pic ? item.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
                                                                                 <span className="active"></span>
                                                                             </div>
                                                                             <div className="flex-grow-1 ms-3">
                                                                                 <h3>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
-                                                                                <p>front end developer</p>
+                                                                                <p>
+                                                                                    {item.msg && item.msg.length !== 0 
+                                                                                        ? item.msg.length > 14 
+                                                                                        ? `${item.msg.substring(0, 14)}...` 
+                                                                                        : item.msg 
+                                                                                        : item.photo && item.photo.length !== 0 
+                                                                                        ? <i className="fa-solid fa-image"></i> 
+                                                                                        : <i className="fa-solid fa-video"></i>}
+                                                                                </p>
+
                                                                             </div>
                                                                         </a>
                                                                     </>
@@ -237,7 +317,29 @@ const ChatApp = () => {
                                                     </div>
                                                     <div class="tab-pane fade" id="Closed" role="tabpanel" aria-labelledby="Closed-tab">
                                                         <div className='chat-list'>
-
+                                                            {fetchUser.length !== 0 ? (
+                                                                fetchUser.map((item, index) => (
+                                                                    item.id != null ?
+                                                                    (
+                                                                        <>
+                                                                            <a  key={item.id} className="d-flex align-items-center mt-4" >
+                                                                                <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                                    <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.pro_pic ? item.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
+                                                                                    <span className="active"></span>
+                                                                                </div>
+                                                                                <div className="flex-grow-1 ms-3">
+                                                                                    <h3>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
+                                                                                    <p>front end developer</p>
+                                                                                </div>
+                                                                                <div><FollowBtn/></div>
+                                                                            </a>
+                                                                        </>
+                                                                    ):
+                                                                    (<div></div>)
+                                                                ))
+                                                            ) : (
+                                                                <div>No Message At</div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -274,13 +376,14 @@ const ChatApp = () => {
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
-                                                    <div className='d-flex gap-2 mx-2 float-end'>
+                                                    <div className='d-flex gap-2 mx-2 float-end collapse navbar-collapse'>
                                                         <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => { setMessagetheam('aliceblue');  setBodyBackgroundColor(); } } style={{height : '25px', width: '25px' , backgroundColor : 'aliceblue'}}></div>
+                                                        <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => { setMessagetheam('#ffff');  setBodyBackgroundColor(); } } style={{height : '25px', width: '25px' , backgroundColor : '#ffff'}}></div>
                                                         <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => { setMessagetheam('antiquewhite');  setBodyBackgroundColor(); } } style={{height : '25px', width: '25px' , backgroundColor : 'antiquewhite'}}></div>
                                                         <div className='rounded-circle border border-1 border-dark-subtle'  onClick={() => { setMessagetheam('lavender');  setBodyBackgroundColor(); } } style={{height : '25px', width: '25px' , background : 'lavender'}}></div>
                                                         <div className='rounded-circle border border-1 border-dark-subtle text-center align-items-center justify-content-center' data-bs-toggle="collapse" data-bs-target="#toggleContent" aria-expanded="false" aria-controls="toggleContent"  style={{height : '25px', width: '25px' ,zIndex : '99', background : 'linear-gradient(135deg, rgb(167 89 159 / 79%), rgb(64 156 176))'}}><i class="fa-solid fa-plus text-white fs-10"></i>
-                                                        <div className='hide' id="toggleContent" style={{ position : 'absolute' ,left: '73vh' ,top :'51px'}}><TwitterPicker style={{ zIndex : '999' }} colors={lightColors} onChangeComplete={(color) => { setMessagetheam(color.hex);  setBodyBackgroundColor(); } }  /></div> 
                                                         </div>
+                                                        <div className='collapse' id="toggleContent" style={{ position :'absolute' , zIndex:'999'  ,left: '73vh' ,top :'51px'}}><TwitterPicker style={{ zIndex : '999' }} colors={lightColors} onChangeComplete={(color) => { setMessagetheam(color.hex);  setBodyBackgroundColor(); } }  /></div> 
                                                     </div>
                                                     {/* <ul class="moreoption">
                                                         <li class="navbar nav-item dropdown">
@@ -299,7 +402,7 @@ const ChatApp = () => {
                                             </div>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="msg-body mx-3">
+                                            <div class="msg-body px-3">
                                                 {
                                                     userbyuseriddata.length==0?
                                                     (<>
@@ -423,9 +526,9 @@ const ChatApp = () => {
                                                         }
 
                                                         acc.items.push(
-                                                            <li className={UserID === item.from_user_id ? "repaly" : "sender"} key={index}>
+                                                            <li className={UserID === item.from_user_id ? "repaly rounded-4" : "sender rounded-4"} key={index}>
                                                             <div>
-                                                                <p>
+                                                                <p className={item.video && item.video !== '' ? 'p-0' : item.photo && item.photo !== '' ? 'p-0' :''}>
                                                                 {
                                                                     item.msg && item.msg !== '' ? (
                                                                     item.msg
@@ -470,7 +573,7 @@ const ChatApp = () => {
                                                     <div class="button-wrapper">
                                                         <span class="label">
                                                             <img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/upload.svg" alt="image title"/> attached file 
-                                                        </span><input type="file" name="upload" id="upload" class="upload-box" placeholder="Upload File" aria-label="Upload File"/>
+                                                        </span><input type="file" onChange={handleFileChange} name="upload" id="upload" class="upload-box" placeholder="Upload File" aria-label="Upload File"/>
                                                     </div>
                                                 </div>
                                             </div>
