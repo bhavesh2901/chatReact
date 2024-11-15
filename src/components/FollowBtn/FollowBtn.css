@@ -1,5 +1,25 @@
-.followbtn:hover
-{
- background-color: #65a4e3 !important;
- color:white !important;
-}
+
+ .followBtn,.unfollowbtn{
+    border-radius: 10px;
+   
+ }
+  
+ .followBtn
+ {
+    background-color: #65a4e3 !important;
+ }
+ .unfollowbtn
+ {
+    background-color: #de8e73 !important;
+    color: white;
+    opacity: 0;
+ }
+  .followBtn:hover {
+     border: 2 solid rgba(119, 19, 173, 0.726);
+  }
+
+  .unfollowbtn:hover {
+    opacity: 1;
+     border: 2 solid rgb(199, 173, 25);
+     color: white;
+  }

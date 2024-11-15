@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 
-const ImageViewer = ({ imageUrls }) => {
+const ImageViewer = ({ imageUrls ,imgwidth , imgheight ,borderradius }) => {
   const [isImageOpen, setIsImageOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
 
@@ -15,7 +15,7 @@ const ImageViewer = ({ imageUrls }) => {
       <div>
         <div className="chat-messages">
           <div onClick={() => openImage(imageUrls)} style={{ cursor: 'pointer' }}>
-            <img style={{borderRadius :'20px'}} src={imageUrls} alt="Thumbnail" width="200" height="130" />
+            <img style={{borderRadius : borderradius}} src={imageUrls} alt="Thumbnail" width={imgwidth} height={imgheight} />
           </div>
         </div>
 

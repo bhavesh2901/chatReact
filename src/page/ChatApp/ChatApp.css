@@ -441,7 +441,7 @@ a.add img {
     line-height: 1.5;
     font-weight: 500;
     padding: 15px;
-    background: #1c1a1a8a;
+    background: #202c33c2;
     display: inline-block;
     border-bottom-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -489,7 +489,7 @@ a.add img {
     line-height: 1.5;
     font-weight: 500;
     padding: 15px;
-    background: linear-gradient(135deg, rgb(110, 115, 183), rgb(49, 230, 202));
+    background: linear-gradient(135deg, rgba(109, 35, 151, 0.79), rgba(140, 22, 83, 0.87));
     display: inline-block;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;

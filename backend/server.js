@@ -329,6 +329,75 @@ WHERE u.id != ?
   });
 });
 
+
+// Example routes
+app.get('/api/follow/status/:currentUserId/:targetUserId', (req, res) => {
+  const { currentUserId, targetUserId } = req.params;
+
+  const query = 'SELECT EXISTS(SELECT 1 FROM follow_list WHERE follower_id = ? AND userid = ?) AS isFollowing';
+  
+  db.query(query, [currentUserId, targetUserId], (err, result) => {
+    if (err) return res.status(500).send('Database query error');
+    
+    const isFollowing = result[0].isFollowing ? true : false;
+    res.json({ isFollowing });
+  });
+});
+
+// 2. Follow a user
+app.post('/api/follow', (req, res) => {
+  const { follower_id, user_id } = req.body;
+
+  const query = 'INSERT INTO follow_list (follower_id, userid) VALUES (?, ?)';
+  
+  db.query(query, [follower_id, user_id], (err, result) => {
+    if (err) return res.status(500).send('Error following user');
+    
+    res.status(200).send('Followed successfully');
+  });
+});
+
+// 3. Unfollow a user
+app.post('/api/unfollow', (req, res) => {
+  const { follower_id, user_id } = req.body;
+
+  const query = 'DELETE FROM follow_list WHERE follower_id = ? AND userid = ?';
+  
+  db.query(query, [follower_id, user_id], (err, result) => {
+    if (err) return res.status(500).send('Error unfollowing user');
+    
+    res.status(200).send('Unfollowed successfully');
+  });
+});
+
+app.get('/api/get-unread-messages', async (req, res) => {
+  const { to_user_id } = req.query;
+
+  const query = `
+    SELECT m.id, m.from_user_id, m.msg, m.photo, m.video, m.doc, m.create_at , u.name
+    FROM messages m
+    LEFT JOIN user u ON m.from_user_id = u.id 
+    WHERE m.to_user_id = ? 
+    ORDER BY m.create_at DESC
+    LIMIT 1;
+  `;
+
+  db.query(query, [to_user_id], (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+  
+    if (results.length > 0) {
+      res.json(results[0]); // Send the first result as JSON
+    } else {
+      res.json(null); // Send null if no results are found
+    }
+  });
+});
+
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

@@ -4,6 +4,7 @@ import Header from '../Header/Header';
 import axios from 'axios';
 import { UserProvider ,useUser } from '../../UserContext';
 import Chatcontainer from '../../components/VideoPlayer/VideoPlayer';
+import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { Fade, Zoom } from 'react-awesome-reveal';
@@ -13,6 +14,7 @@ import Rightsidebar from '../../components/Rightsidebar/Rightsidebar';
 import { TwitterPicker,  AlphaPicker ,BlockPicker ,ChromePicker, CirclePicker ,CompactPicker, GithubPicker, HuePicker ,MaterialPicker, PhotoshopPicker, SketchPicker, SliderPicker, SwatchesPicker} from 'react-color';
 import { useDropzone } from 'react-dropzone';
 import FollowBtn from '../../components/FollowBtn/FollowBtn';
+import ChatNotification from '../../components/ChatNotification/ChatNotification';
 
 const ChatApp = () => {
     const [showBox, setShowBox] = useState(false);
@@ -73,21 +75,11 @@ const ChatApp = () => {
         msthem =   user['msthem']
         mscolor =   user['mscolor']
     }
-  
+    document.body.style.background = mscolor;
     const handleChatIconClick = () => {
       setShowBox(false);
     };
    
-  
-    setTimeout(() => {
-        const divs3 = document.getElementsByClassName("repaly"); // Remove the dot prefix
-        Array.from(divs3).forEach(div3 => {
-        const pElement = div3.querySelector("p"); // Select the <p> element inside each .repaly
-        if (pElement) {
-            pElement.style.background = mscolor; // Set the background color on <p>
-        }
-        });
-    }, 1000);
 
     const setBodyBackgroundColor =  async ()=>
     {
@@ -119,20 +111,10 @@ const ChatApp = () => {
         }
        
     }
-  
+
     const loadChat = async (id) => {
       
-        setTimeout(() => {
-            const divs3 = document.getElementsByClassName("repaly"); // Remove the dot prefix
-            Array.from(divs3).forEach(div3 => {
-            const pElement = div3.querySelector("p"); // Select the <p> element inside each .repaly
-            if (pElement) {
-                pElement.style.background = mscolor; // Set the background color on <p>
-            }
-            });
-        }, 500);
-            
-     
+       
         try {
             const response = await axios.get(`http://localhost:3000/api/userByuserid/${id}`);
             setUserbyuseriddata(response.data[0]);
@@ -158,11 +140,12 @@ const ChatApp = () => {
         }
     }, [followingId]);
 
-
+    const [lastmessage , setLastmessage]= useState([]);
     const fetchfollouser = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/api/followlistuser/${UserID}`);
           setFollowuser(response.data); // Assuming the API returns { isInWishlist: true/false }
+          
         } catch (error) {
           console.error('Error follouser wishlist status:', error);
         }
@@ -248,6 +231,7 @@ const ChatApp = () => {
   return (
     <>
      <Header/>
+     <ChatNotification userId={UserID}/>
     <div className='container'>
         <section class="message-area mt-2">
             <div class="container-fluid">
@@ -262,7 +246,7 @@ const ChatApp = () => {
                                                 <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Search" aria-label="search"/>
                                                 <a class="add" href="#"><img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/add.svg" alt="add"/></a>
                                             </div>
-
+                                          
                                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link active" id="Open-tab" data-bs-toggle="tab" data-bs-target="#Open" type="button" role="tab" aria-controls="Open" aria-selected="true">Chat</button>
@@ -291,7 +275,7 @@ const ChatApp = () => {
                                                                                 <span className="active"></span>
                                                                             </div>
                                                                             <div className="flex-grow-1 ms-3">
-                                                                                <h3>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
+                                                                                <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
                                                                                 <p>
                                                                                     {item.msg && item.msg.length !== 0 
                                                                                         ? item.msg.length > 14 
@@ -303,6 +287,7 @@ const ChatApp = () => {
                                                                                 </p>
 
                                                                             </div>
+                                                                            <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.id}/></div>
                                                                         </a>
                                                                     </>
                                                                 ):
@@ -324,14 +309,15 @@ const ChatApp = () => {
                                                                         <>
                                                                             <a  key={item.id} className="d-flex align-items-center mt-4" >
                                                                                 <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
-                                                                                    <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.pro_pic ? item.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
+                                                                                <ImageViewer imageUrls={item.pro_pic} imgwidth={'40px'}  imgheight={'40px'} borderradius={'50%'} />
+                                                                                    {/* <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.pro_pic ? item.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" /> */}
                                                                                     <span className="active"></span>
                                                                                 </div>
                                                                                 <div className="flex-grow-1 ms-3">
-                                                                                    <h3>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
+                                                                                    <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
                                                                                     <p>front end developer</p>
                                                                                 </div>
-                                                                                <div><FollowBtn/></div>
+                                                                                <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.id}/></div>
                                                                             </a>
                                                                         </>
                                                                     ):
@@ -511,7 +497,8 @@ const ChatApp = () => {
                                                         const today = new Date();
                                                         const diffInTime = today.setHours(0, 0, 0, 0) - messageDate.setHours(0, 0, 0, 0);
                                                         const diffInDays = diffInTime / (1000 * 3600 * 24);
-                                                        const formattedTime = messageDate.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                                                        var formattedTime = '';
+                                                         formattedTime = new Date(item.create_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});
 
                                                         // Determine the header for today, yesterday, or older
                                                         if (diffInDays === 0 && !acc.todayHeaderShown) {
@@ -536,7 +523,7 @@ const ChatApp = () => {
                                                                     <VideoPlayer videoUrls={item.video} />
                                                                     ) : 
                                                                     (
-                                                                        <ImageViewer imageUrls={item.photo}/>
+                                                                        <ImageViewer imageUrls={item.photo} imgwidth={'200px'}  imgheight={'130px'} borderradius={'20px'} />
                                                                     )
                                                                 }
                                                                 </p>
