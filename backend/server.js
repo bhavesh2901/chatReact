@@ -72,10 +72,10 @@ const generateRandomToken = () => {
     });
   });
   app.post('/api/signup/add', (req, res) => {
-    const { Role_id, phone, name, signupemail, signuppassword, Status } = req.body;
+    const {  phone, name, signupemail, signuppassword, Status } = req.body;
   
     // First, check if the email or phone number already exists in the database
-    const checkQuery = 'SELECT * FROM users WHERE email = ? OR mobail = ?';
+    const checkQuery = 'SELECT * FROM user WHERE email = ? OR mobail = ?';
     db.query(checkQuery, [signupemail, phone], (err, result) => {
       if (err) {
         return res.status(500).json({ error: err.message });
@@ -86,8 +86,8 @@ const generateRandomToken = () => {
         return res.status(409).json({ message: 'User already exists' });
       } else {
         // If no user is found, proceed with the insertion
-        const insertQuery = 'INSERT INTO users ( mobail, user_profile, email, password, ac_status) VALUES (?, ?, ?, ?, ?, ?)';
-        db.query(insertQuery, [Role_id, phone, name, signupemail, signuppassword, Status], (err, result) => {
+        const insertQuery = 'INSERT INTO user ( mobail, user_profile, email, password, ac_status) VALUES (?, ?, ?, ?, ?)';
+        db.query(insertQuery, [ phone, name, signupemail, signuppassword, Status], (err, result) => {
           if (err) {
             return res.status(500).json({ error: err.message });
           }
@@ -151,7 +151,6 @@ WHERE f1.follower_id = ?
   )
 ORDER BY u.id;
 ;
-
     `;
 
 
@@ -377,7 +376,7 @@ app.get('/api/get-unread-messages', async (req, res) => {
     SELECT m.id, m.from_user_id, m.msg, m.photo, m.video, m.doc, m.create_at , u.name
     FROM messages m
     LEFT JOIN user u ON m.from_user_id = u.id 
-    WHERE m.to_user_id = ? 
+    WHERE m.to_user_id = ? AND read_status = 0
     ORDER BY m.create_at DESC
     LIMIT 1;
   `;
@@ -394,6 +393,72 @@ app.get('/api/get-unread-messages', async (req, res) => {
       res.json(null); // Send null if no results are found
     }
   });
+});
+
+app.get('/api/notifiaction/:userID', (req, res) => {
+  const userID = req.params.userID; // Use userID from params
+  
+  const query = ` SELECT 
+                    n.*, 
+                    uf.pro_pic AS whoProPic, 
+                    uf.user_profile AS whoName, 
+                    uw.pro_pic AS whomPic, 
+                    uw.user_profile AS whomName
+                  FROM notification n
+                  LEFT JOIN user uf ON n.whofollow = uf.id 
+                  LEFT JOIN user uw ON n.whom = uw.id 
+                  WHERE n.whofollow = ? AND n.whom = ?
+                `;
+
+
+  db.query(query, [userID , userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
+
+
+app.post('/api/updateMessageStatus', async (req, res) => {
+  const { senderid, receiverid } = req.body;
+
+  try {
+    // First query
+    const firstUpdate = await new Promise((resolve, reject) => {
+      db.query(
+        'UPDATE messages SET read_status = ? WHERE from_user_id = ? AND to_user_id = ?',
+        [1, senderid, receiverid],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        }
+      );
+    });
+
+    // Second query
+    const secondUpdate = await new Promise((resolve, reject) => {
+      db.query(
+        'UPDATE messages SET read_status = ? WHERE from_user_id = ? AND to_user_id = ?',
+        [1, receiverid, senderid],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        }
+      );
+    });
+
+    // Check if either query updated rows
+    if (firstUpdate.affectedRows > 0 || secondUpdate.affectedRows > 0) {
+      res.status(200).json({ message: 'Message status updated successfully!' });
+    } else {
+      res.status(404).json({ message: 'No messages found to update.' });
+    }
+  } catch (error) {
+    console.error('Error updating message status:', error);
+    res.status(500).json({ message: 'Failed to update message status.' });
+  }
 });
 
 

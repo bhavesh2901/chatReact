@@ -28,6 +28,7 @@ const ChatApp = () => {
 
     const handleChatListClick = () => {
       setShowBox(true);
+      
     };
     const [file, setFile] = useState(null);
 
@@ -75,7 +76,6 @@ const ChatApp = () => {
         msthem =   user['msthem']
         mscolor =   user['mscolor']
     }
-    document.body.style.background = mscolor;
     const handleChatIconClick = () => {
       setShowBox(false);
     };
@@ -114,7 +114,6 @@ const ChatApp = () => {
 
     const loadChat = async (id) => {
       
-       
         try {
             const response = await axios.get(`http://localhost:3000/api/userByuserid/${id}`);
             setUserbyuseriddata(response.data[0]);
@@ -228,6 +227,35 @@ const ChatApp = () => {
       useEffect(() => {
         fetchuser();
       }, [UserID]);
+
+      const [NotifyUser , setNotifyUser] = useState([]);
+      const fetchNotification  = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/notifiaction/${UserID}`);
+          setNotifyUser(response.data); // Assuming the API returns { isInWishlist: true/false }
+          
+        } catch (error) {
+          console.error('Error notifiaction status:', error);
+        }
+      };
+  
+      // Fetch the wishlist status on component mount
+    
+      useEffect(() => {
+        fetchNotification();
+      }, [UserID]);
+
+
+      const changeMsgStatus = async (receiverid) => {
+        try {
+            await axios.post('http://localhost:3000/api/updateMessageStatus', {
+              senderid : UserID,
+              receiverid : receiverid
+            });
+          } catch (error) {
+            console.error('Error submitting rating:', error);
+          }
+      }
   return (
     <>
      <Header/>
@@ -252,7 +280,13 @@ const ChatApp = () => {
                                                     <button class="nav-link active" id="Open-tab" data-bs-toggle="tab" data-bs-target="#Open" type="button" role="tab" aria-controls="Open" aria-selected="true">Chat</button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
-                                                    <button class="nav-link" id="Closed-tab" data-bs-toggle="tab" data-bs-target="#Closed" type="button" role="tab" aria-controls="Closed" aria-selected="false">Follow</button>
+                                                    <button class="nav-link" id="Closed-tab" data-bs-toggle="tab" data-bs-target="#Closed" type="button" role="tab" aria-controls="Closed" aria-selected="false">suggestion</button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link" id="Closed-tab-Follower" data-bs-toggle="tab" data-bs-target="#Follower-pan" type="button" role="tab" aria-controls="Follower-pan" aria-selected="false">Follower</button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link" id="Closed-tab-Following" data-bs-toggle="tab" data-bs-target="#Following-pan" type="button" role="tab" aria-controls="Following-pan" aria-selected="false">Following</button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -269,7 +303,7 @@ const ChatApp = () => {
                                                                 item.id != null ?
                                                                 (
                                                                     <>
-                                                                        <a onClick={(e) => { e.preventDefault(); handleChatListClick(); setFollowingId(item.id); loadChat(item.id) }} key={item.id} className="d-flex align-items-center mt-4" data-bs-toggle="offcanvas" href="#offcanvasStart" role="button" aria-controls="offcanvasStart">
+                                                                        <a onClick={(e) => { e.preventDefault(); handleChatListClick(); changeMsgStatus(item.id); setFollowingId(item.id); loadChat(item.id) }} key={item.id} className="d-flex align-items-center mt-4" data-bs-toggle="offcanvas" href="#offcanvasStart" role="button" aria-controls="offcanvasStart">
                                                                             <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
                                                                                 <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.pro_pic ? item.pro_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
                                                                                 <span className="active"></span>
@@ -327,6 +361,61 @@ const ChatApp = () => {
                                                                 <div>No Message At</div>
                                                             )}
                                                         </div>
+                                                    </div>
+                                                    <div class="tab-pane fade" id="Follower-pan" role="tabpanel" aria-labelledby="Closed-tab-Follower">
+                                                            <div className='chat-list'> 
+                                                                {NotifyUser.length !== 0 ? (
+                                                                    NotifyUser.map((item, index) => (
+                                                                        item.id != null ?
+                                                                        (
+                                                                            <> 
+                                                                                <a  key={item.id} className="d-flex align-items-center mt-4 mx-3" >
+                                                                                    <div className="flex-shrink-0" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                                        <img src={item.whomPic} className='border border-1' style={{ borderRadius :'50%'}} height='30' width='30'></img>
+                                                                                        <span style={{left : '39px' , top :'17px'}} className='position-absolute  cartitem-badge fs-10  translate-middle badge rounded-pill'><img className='border border-1' height='30' style={{ borderRadius :'50%'}} width='30' src={item.whoProPic}></img></span>
+                                                                                    </div>
+                                                                                    <div className="flex-grow-1 ms-3">
+                                                                                        <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
+                                                                                        <p>{item.notify}</p>
+                                                                                    </div>
+                                                                                    <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.whom}/></div>
+                                                                                </a>
+                                                                            </>
+                                                                        ):
+                                                                        (<div></div>)
+                                                                    ))
+                                                                ) : (
+                                                                    <div>No Message At</div>
+                                                                )}
+                                                            </div>
+                                                    </div>
+
+                                                    <div class="tab-pane fade" id="Following-pan" role="tabpanel" aria-labelledby="Closed-tab-Following">
+                                                            <div className='chat-list'> 
+                                                                {NotifyUser.length !== 0 ? (
+                                                                    NotifyUser.map((item, index) => (
+                                                                        item.id != null ?
+                                                                        (
+                                                                            <> 
+                                                                                <a  key={item.id} className="d-flex align-items-center mt-4 mx-3" >
+                                                                                    <div className="flex-shrink-0" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                                        <img src={item.whomPic} className='border border-1' style={{ borderRadius :'50%'}} height='30' width='30'></img>
+                                                                                        <span style={{left : '39px' , top :'17px'}} className='position-absolute  cartitem-badge fs-10  translate-middle badge rounded-pill'><img className='border border-1' height='30' style={{ borderRadius :'50%'}} width='30' src={item.whoProPic}></img></span>
+                                                                                    </div>
+                                                                                    <div className="flex-grow-1 ms-3">
+                                                                                        <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
+                                                                                        <p>{item.notify}</p>
+                                                                                    </div>
+                                                                                    <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.whom}/></div>
+                                                                                </a>
+                                                                            </>
+                                                                        ):
+                                                                        (<div></div>)
+                                                                    ))
+                                                                ) : (
+                                                                    <div>No Message At</div>
+                                                                )}
+                                                            </div>
                                                     </div>
                                                 </div>
                                             </div>

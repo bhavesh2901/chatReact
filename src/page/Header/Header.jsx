@@ -173,7 +173,7 @@ const Header = () => {
                 )
               }
              
-              <div className={`mx-2 ${statusname ? 'show' : 'hide'}`}>{name}</div>
+              <div className={`mx-2 ${statusname ? 'show' : 'hide'}`}>{name ? name : fullname? fullname : ''}</div>
             </div>
             
       </div>

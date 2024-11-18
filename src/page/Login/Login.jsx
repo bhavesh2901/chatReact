@@ -45,12 +45,11 @@ const LoginSignup = () => {
             let response;
 
                 response = await axios.post('http://localhost:3000/api/signup/add', {
-                    Role_id: 1,
                     phone,
                     name,
                     signupemail,
                     signuppassword,
-                    Status: 'active'
+                    Status: 1
                 });
         
                 // Reset the form fields

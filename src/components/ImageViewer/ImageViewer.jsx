@@ -15,7 +15,7 @@ const ImageViewer = ({ imageUrls ,imgwidth , imgheight ,borderradius }) => {
       <div>
         <div className="chat-messages">
           <div onClick={() => openImage(imageUrls)} style={{ cursor: 'pointer' }}>
-            <img style={{borderRadius : borderradius}} src={imageUrls} alt="Thumbnail" width={imgwidth} height={imgheight} />
+            <img style={{borderRadius : borderradius}} src={imageUrls ?imageUrls : './nouser.png'} alt="Thumbnail" width={imgwidth} height={imgheight} />
           </div>
         </div>
 

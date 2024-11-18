@@ -24,7 +24,7 @@ const ChatNotification = ({ userId }) => {
                   <p>{response.data.msg}</p>
                 </div>,
                 {
-                  position: "top-right",
+                  position: "top-left",
                   autoClose: 3000,
                   hideProgressBar: false,
                   closeOnClick: true,
@@ -48,7 +48,7 @@ const ChatNotification = ({ userId }) => {
     };
 
     // Poll every 5 seconds
-    const interval = setInterval(fetchMessages, 5000);
+    const interval = setInterval(fetchMessages, 2000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [userId, lastMessageId]);
