@@ -462,6 +462,61 @@ app.post('/api/updateMessageStatus', async (req, res) => {
 });
 
 
+app.get('/api/followrList/:userID', (req, res) => {
+  const userID = req.params.userID; // Use userID from params
+  
+  const query = `SELECT 
+    f.follower_id AS follower_id,
+    uf.user_profile AS user_profile,
+    uf.email AS follower_email,
+    uf.name AS name,
+    uf.pro_pic AS follower_profile_pic,
+    uf.bio_pic AS follower_bio_pic
+    FROM 
+        follow_list f
+    JOIN 
+        user uf ON f.follower_id = uf.id
+    WHERE 
+        f.userid = ?;
+ `;
+
+  db.query(query, [userID ,userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
+
+
+app.get('/api/followingList/:userID', (req, res) => {
+  const userID = req.params.userID; // Use userID from params
+  
+  const query = `SELECT 
+    f.userid AS userid,
+    uf.user_profile AS user_profile,
+    uf.email AS follower_email,
+    uf.name AS name,
+    uf.pro_pic AS follower_profile_pic,
+    uf.bio_pic AS follower_bio_pic
+    FROM 
+        follow_list f
+    JOIN 
+        user uf ON f.userid = uf.id
+    WHERE 
+        f.follower_id = ?;
+ `;
+
+  db.query(query, [userID ,userID], (err, results) => {
+    if (err) {
+      console.error('Error fetching data:', err);
+      return res.status(500).send('Server error'); // Properly handle the error response
+    }
+    res.json(results); // Send the results as JSON
+  });
+});
+
 
 // Start the server
 app.listen(PORT, () => {

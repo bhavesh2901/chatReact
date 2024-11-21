@@ -72,7 +72,7 @@ const Header = () => {
    
   return (
     <>
-<div class="offcanvas offcanvas-start mx-2 shadow" style={{backgroundColor : "#8a8888" , borderRadius :'40px'}} data-bs-backdrop="false" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
+<div class="offcanvas offcanvas-start mx-2 shadow" style={{backgroundColor : "#8a8888" , borderRadius :'40px' }} data-bs-backdrop="false" tabindex="-1" id="staticBackdrop" aria-labelledby="staticBackdropLabel">
   <div class="">
   <button type="button" class="btn position-absolute  fs-10 translate-middle rounded  fs-5" onClick={()=>setStatusname(true)} style={{ top: "30px" , left: "362px" , zIndex : '99'}}  data-bs-dismiss="offcanvas" aria-label="Close"><i class="fa-solid fa-xmark text-white"></i></button>
     <div className='profile-top  p-2' style={{ borderRadius : '40px'}}>
@@ -127,7 +127,9 @@ const Header = () => {
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-      <a class="" href="#" ><img src='/assets/Facebook_Messenger-512.webp' height='30' width='30'></img></a>
+      <div className='d-flex border border-1 rounded-3 p-1 bg-white  align-items-center justify-content-center' style={{lineHeight :'0px' , rotate :'339deg' , lineHeight : '9px'}}>
+        <a class="" href="#" ><img src='/assets/send.png' height='30' width='30'></img></a>
+      </div>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -135,10 +137,10 @@ const Header = () => {
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <Link class="nav-link active" aria-current="page" to="/">Home</Link>
+            {/* <Link class="nav-link active" aria-current="page" to="/">Home</Link> */}
           </li>
           <li class="nav-item">
-          <Link class="nav-link active" aria-current="page" to="/loginsignup">Login</Link>
+          {/* <Link class="nav-link active" aria-current="page" to="/loginsignup">Login</Link> */}
           </li>
           <li class="nav-item dropdown">
             {/* <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

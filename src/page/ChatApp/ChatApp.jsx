@@ -245,6 +245,7 @@ const ChatApp = () => {
         fetchNotification();
       }, [UserID]);
 
+     
 
       const changeMsgStatus = async (receiverid) => {
         try {
@@ -256,6 +257,33 @@ const ChatApp = () => {
             console.error('Error submitting rating:', error);
           }
       }
+    const [followerListData , setFollowerListData] = useState([]);
+    const followerList = async () => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/followrList/${UserID}`);
+            setFollowerListData(response.data); // Assuming the API returns { isInWishlist: true/false }
+            
+          } catch (error) {
+            console.error('Error follouser wishlist status:', error);
+          }
+    }
+    useEffect(() => {
+        followerList();
+    }, [UserID]);
+
+    const [followingListData , setFolloingListData] = useState([]);
+    const followingList = async () => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/followingList/${UserID}`);
+            setFolloingListData(response.data); // Assuming the API returns { isInWishlist: true/false }
+            
+          } catch (error) {
+            console.error('Error follouser wishlist status:', error);
+          }
+    }
+    useEffect(() => {
+        followingList();
+    }, [UserID]);
   return (
     <>
      <Header/>
@@ -275,7 +303,7 @@ const ChatApp = () => {
                                                 <a class="add" href="#"><img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/add.svg" alt="add"/></a>
                                             </div>
                                           
-                                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                            <ul class="nav nav-tabs chatLeftSideTab" style={{ overflowY : 'hidden' , minWidth:'272px'  }} id="myTab" role="tablist">
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link active" id="Open-tab" data-bs-toggle="tab" data-bs-target="#Open" type="button" role="tab" aria-controls="Open" aria-selected="true">Chat</button>
                                                 </li>
@@ -364,25 +392,41 @@ const ChatApp = () => {
                                                     </div>
                                                     <div class="tab-pane fade" id="Follower-pan" role="tabpanel" aria-labelledby="Closed-tab-Follower">
                                                             <div className='chat-list'> 
-                                                                {NotifyUser.length !== 0 ? (
-                                                                    NotifyUser.map((item, index) => (
-                                                                        item.id != null ?
-                                                                        (
-                                                                            <> 
-                                                                                <a  key={item.id} className="d-flex align-items-center mt-4 mx-3" >
-                                                                                    <div className="flex-shrink-0" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
-                                                                                        <img src={item.whomPic} className='border border-1' style={{ borderRadius :'50%'}} height='30' width='30'></img>
-                                                                                        <span style={{left : '39px' , top :'17px'}} className='position-absolute  cartitem-badge fs-10  translate-middle badge rounded-pill'><img className='border border-1' height='30' style={{ borderRadius :'50%'}} width='30' src={item.whoProPic}></img></span>
-                                                                                    </div>
-                                                                                    <div className="flex-grow-1 ms-3">
-                                                                                        <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
-                                                                                        <p>{item.notify}</p>
-                                                                                    </div>
-                                                                                    <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.whom}/></div>
-                                                                                </a>
-                                                                            </>
-                                                                        ):
-                                                                        (<div></div>)
+                                                                {followerListData.length !== 0 ? (
+                                                                    followerListData.map((item, index) => (
+                                                                        <>
+                                                                            <a  key={index} className="d-flex align-items-center mt-4" data-bs-toggle="offcanvas" href="#offcanvasStart" role="button" aria-controls="offcanvasStart">
+                                                                                <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                                    <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.follower_profile_pic ? item.follower_profile_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
+                                                                                    <span className="active"></span>
+                                                                                </div>
+                                                                                <div className="flex-grow-1 ms-3">
+                                                                                    <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.follower_email? item.follower_email : item.name }</h3>
+                                                                                    <p>
+                                                                                    {item.follower_email? item.follower_email : ''}
+                                                                                    </p>
+
+                                                                                </div>
+                                                                                <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.follower_id}/></div>
+                                                                            </a>
+                                                                        </>
+                                                                        // item.id != null ?
+                                                                        // (
+                                                                        //     <> 
+                                                                        //         <a  key={index} className="d-flex align-items-center mt-4 mx-3" >
+                                                                        //             <div className="flex-shrink-0" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                        //                 <img src={item.follower_profile_pic} className='border border-1' style={{ borderRadius :'50%'}} height='30' width='30'></img>
+                                                                        //                 {/* <span style={{left : '39px' , top :'17px'}} className='position-absolute  cartitem-badge fs-10  translate-middle badge rounded-pill'><img className='border border-1' height='30' style={{ borderRadius :'50%'}} width='30' src={item.whoProPic}></img></span> */}
+                                                                        //             </div>
+                                                                        //             <div className="flex-grow-1 ms-3">
+                                                                        //                 <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.follower_email? item.follower_email : item.name }</h3>
+                                                                        //                 <p>{item.follower_email}</p>
+                                                                        //             </div>
+                                                                        //             <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.follower_id}/></div>
+                                                                        //         </a>
+                                                                        //     </>
+                                                                        // ):
+                                                                        // (<div></div>)
                                                                     ))
                                                                 ) : (
                                                                     <div>No Message At</div>
@@ -392,25 +436,41 @@ const ChatApp = () => {
 
                                                     <div class="tab-pane fade" id="Following-pan" role="tabpanel" aria-labelledby="Closed-tab-Following">
                                                             <div className='chat-list'> 
-                                                                {NotifyUser.length !== 0 ? (
-                                                                    NotifyUser.map((item, index) => (
-                                                                        item.id != null ?
-                                                                        (
-                                                                            <> 
-                                                                                <a  key={item.id} className="d-flex align-items-center mt-4 mx-3" >
-                                                                                    <div className="flex-shrink-0" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
-                                                                                        <img src={item.whomPic} className='border border-1' style={{ borderRadius :'50%'}} height='30' width='30'></img>
-                                                                                        <span style={{left : '39px' , top :'17px'}} className='position-absolute  cartitem-badge fs-10  translate-middle badge rounded-pill'><img className='border border-1' height='30' style={{ borderRadius :'50%'}} width='30' src={item.whoProPic}></img></span>
-                                                                                    </div>
-                                                                                    <div className="flex-grow-1 ms-3">
-                                                                                        <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.mobail? item.mobail : item.name }</h3>
-                                                                                        <p>{item.notify}</p>
-                                                                                    </div>
-                                                                                    <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.whom}/></div>
-                                                                                </a>
-                                                                            </>
-                                                                        ):
-                                                                        (<div></div>)
+                                                            {followingListData.length !== 0 ? (
+                                                                    followingListData.map((item, index) => (
+                                                                        <>
+                                                                            <a  key={index} className="d-flex align-items-center mt-4" data-bs-toggle="offcanvas" href="#offcanvasStart" role="button" aria-controls="offcanvasStart">
+                                                                                <div className="flex-shrink-0 border border-1" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                                    <img className="img-fluid" style={{borderRadius:'50%'  ,height:'100%' , width:'100%'}}   src={item.follower_profile_pic ? item.follower_profile_pic : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" } alt="user img" />
+                                                                                    <span className="active"></span>
+                                                                                </div>
+                                                                                <div className="flex-grow-1 ms-3">
+                                                                                    <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.follower_email? item.follower_email : item.name }</h3>
+                                                                                    <p>
+                                                                                    {item.follower_email? item.follower_email : ''}
+                                                                                    </p>
+
+                                                                                </div>
+                                                                                <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.userid}/></div>
+                                                                            </a>
+                                                                        </>
+                                                                        // item.id != null ?
+                                                                        // (
+                                                                        //     <> 
+                                                                        //         <a  key={index} className="d-flex align-items-center mt-4 mx-3" >
+                                                                        //             <div className="flex-shrink-0" style={{borderRadius:'50%' , height:'45px' , width:'45px'}}>
+                                                                        //                 <img src={item.follower_profile_pic} className='border border-1' style={{ borderRadius :'50%'}} height='30' width='30'></img>
+                                                                        //                 {/* <span style={{left : '39px' , top :'17px'}} className='position-absolute  cartitem-badge fs-10  translate-middle badge rounded-pill'><img className='border border-1' height='30' style={{ borderRadius :'50%'}} width='30' src={item.whoProPic}></img></span> */}
+                                                                        //             </div>
+                                                                        //             <div className="flex-grow-1 ms-3">
+                                                                        //                 <h3 className='text-nowrap'>{item.user_profile !=null ? item.user_profile  : item.follower_email? item.follower_email : item.name }</h3>
+                                                                        //                 <p>{item.follower_email}</p>
+                                                                        //             </div>
+                                                                        //             <div onClick={()=>{fetchfollouser(); fetchuser();}}><FollowBtn currentUserId={UserID} targetUserId={item.follower_id}/></div>
+                                                                        //         </a>
+                                                                        //     </>
+                                                                        // ):
+                                                                        // (<div></div>)
                                                                     ))
                                                                 ) : (
                                                                     <div>No Message At</div>
